@@ -24,10 +24,11 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor(red: 255/255, green: 239/255, blue: 239/255, alpha: 1)
+        //color is ugly, change it
+        view.backgroundColor = UIColor(red: 245/255, green: 204/255, blue: 245/255, alpha: 1)
         
         title = "Anime News"
-        navigationController?.navigationBar.barTintColor = UIColor(red: 102/255, green: 204/255, blue: 255/255, alpha: 1)
+        navigationController?.navigationBar.barTintColor = UIColor(red: 235/255, green: 204/255, blue: 235/255, alpha: 1)
         navigationController?.navigationBar.tintColor = .blue
         
         
@@ -42,9 +43,12 @@ class ViewController: UIViewController {
         presentModalViewControllerButton = UIButton()
         presentModalViewControllerButton.translatesAutoresizingMaskIntoConstraints = false
         presentModalViewControllerButton.setTitle("Add Anime", for: .normal)
-        presentModalViewControllerButton.setTitleColor(.blue, for: .normal)
+        presentModalViewControllerButton.setTitleColor(.systemBlue, for: .normal)
         presentModalViewControllerButton.backgroundColor = .white
         presentModalViewControllerButton.layer.cornerRadius = 4
+        presentModalViewControllerButton.layer.borderWidth = 1
+        presentModalViewControllerButton.contentEdgeInsets = UIEdgeInsets(top: 5,left: 5,bottom: 5,right: 5)
+        presentModalViewControllerButton.layer.borderColor = UIColor.blue.cgColor
         presentModalViewControllerButton.addTarget(self, action: #selector(presentModalViewController), for: .touchUpInside)
         view.addSubview(presentModalViewControllerButton)
         
@@ -63,22 +67,22 @@ class ViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             presentModalViewControllerButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            presentModalViewControllerButton.bottomAnchor.constraint(equalTo: showsTableView.topAnchor),
+            presentModalViewControllerButton.bottomAnchor.constraint(equalTo: showsTableView.topAnchor, constant: -7.5),
             presentModalViewControllerButton.heightAnchor.constraint(equalToConstant: 50)
             ])
     }
     
     @objc func presentModalViewController() {
        let newViewController = AddAnimeViewController(placeHolder: presentModalViewControllerButton.titleLabel?.text ?? "Placeholder")
-       newViewController.delegate = self
+//       newViewController.delegate = self
        present(newViewController, animated: true, completion: nil)
        
     }
     
     // get all shows
     private func getShows(){
-        NetworkManager.getShows { (gotShows) in
-            self.shows = gotShows
+        NetworkManager.getShows { (shows) in
+            self.shows = shows
             self.showsTableView.reloadData()
             
         }
@@ -112,11 +116,11 @@ extension ViewController: UITableViewDataSource {
         return cell
     }
 }
-
-extension ViewController: NameDelegate{
-    func AddAnime(newTitle: String) {
-        let show = Show(title: newTitle, summary: "", photo: "https://i2.wp.com/www.tor.com/wp-content/uploads/2015/12/NanaTai.png?type=vertical")
-        shows.append(show)
-        showsTableView.reloadData()
-    }
-}
+//
+//extension ViewController: NameDelegate{
+//    func AddAnime(newTitle: String) {
+////        let show = Show(title: newTitle, summary: "", photo: "https://i2.wp.com/www.tor.com/wp-content/uploads/2015/12/NanaTai.png?type=vertical")
+////        shows.append(show)
+//        showsTableView.reloadData()
+//    }
+//}
