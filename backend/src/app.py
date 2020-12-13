@@ -1,10 +1,39 @@
 import json
+import os
+import requests
+import csv
+import xml.etree.ElementTree as ET 
+
+
 
 from time import sleep
 from db import db
 from db import Anime
 from flask import Flask
 from flask import request
+
+url = "https://www.animenewsnetwork.com/encyclopedia/reports.xml?id=155&type=anime&nlist=50"
+initresponse = requests.get(url)
+with open('animereports.xml', 'wb') as f:
+    f.write(initresponse.content)
+
+def parseXML(xmlfile):
+    tree = ET.parse(xmlfile)
+    root = tree.getroot()
+    animeitems = []
+    for child in root:
+        anime = {}
+        name = child.find('name').text
+        if name:
+            anime_id = child.find('id').text
+            print(anime_id)
+            anime['id'] = anime_id
+            anime['name'] = name
+            animeitems.append(anime)
+
+    return animeitems
+
+animes = parseXML('animereports.xml')
 
 app = Flask(__name__)
 db_filename = "anime.db"
@@ -16,6 +45,12 @@ app.config["SQLALCHEMY_ECHO"] = True
 db.init_app(app)
 with app.app_context():
     db.create_all()
+    for a in animes:
+        if a['name']:
+            new_anime = Anime(name=a['name'], description='test')
+            db.session.add(new_anime)
+            db.session.commit()
+            new_anime.serialize()
 
 
 # your routes here
@@ -38,9 +73,9 @@ def get_animes():
 
 
 @app.route("/api/animes/", methods=["POST"])
-def create_course():
+def create_anime():
     body = json.loads(request.data)
-    new_anime = Anime(code=body.get('code'), name=body.get('name'))
+    new_anime = Anime(name=body.get('name'), description=body.get('description'))
     db.session.add(new_anime)
     db.session.commit()
     return success_response(new_anime.serialize(), 201)
@@ -59,4 +94,5 @@ def delete_anime(anime_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
