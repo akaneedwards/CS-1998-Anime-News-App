@@ -82,9 +82,9 @@ class ShowTableViewCell: UITableViewCell {
     }
     
     func configure(for show: Show) {
-        let photoURL = URL(string: show.photo!)
+        let photoURL = URL(string:"https://i2.wp.com/www.tor.com/wp-content/uploads/2015/12/NanaTai.png?type=vertical")
         showImageView.kf.setImage(with: photoURL)
-        nameLabel.text = show.title
+        nameLabel.text = show.name
        
     }
     
