@@ -16,6 +16,7 @@ url = "https://www.animenewsnetwork.com/encyclopedia/reports.xml?id=155&type=ani
 initresponse = requests.get(url)
 with open('animereports.xml', 'wb') as f:
     f.write(initresponse.content)
+desc = """In the land north of Britannia, there is a forest where humans are not allowed to go, and it is known as the "Fairy King's Forest." The one known as the Fairy King, Harlequin, has not been seen for 700 years. His younger sister Elaine guards the Fountain of Youth from human greed by herself. After many partings and 700 years of isolation, her tears are about to dry up. Then, a young man appears seeking the Fountain of Youth. That young man's name is Ban. Over the course of seven days with Ban, Elaine's heart is healed."""
 
 def parseXML(xmlfile):
     tree = ET.parse(xmlfile)
@@ -24,12 +25,9 @@ def parseXML(xmlfile):
     for child in root:
         anime = {}
         name = child.find('name').text
-        if name:
-            anime_id = child.find('id').text
-            print(anime_id)
-            anime['id'] = anime_id
-            anime['name'] = name
-            animeitems.append(anime)
+        anime['name'] = name
+        anime['description'] = desc
+        animeitems.append(anime)
 
     return animeitems
 
@@ -47,7 +45,7 @@ with app.app_context():
     db.create_all()
     for a in animes:
         if a['name']:
-            new_anime = Anime(name=a['name'], description='test')
+            new_anime = Anime(name=a['name'], description=a['description'])
             db.session.add(new_anime)
             db.session.commit()
             new_anime.serialize()
