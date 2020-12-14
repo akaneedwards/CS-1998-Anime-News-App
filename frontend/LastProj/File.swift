@@ -24,14 +24,15 @@ struct Response<T: Codable>: Codable {
     
 }
 //
-//class Show: Codable {
+//class Showes: Codable {
+//    var id: Int
 //    var title: String
 //    var summary: String?
-//    var photo: String?
 //
-//    init(title: String, summary: String?, photo: String?){
+//    init(title: String, summary: String?, id: Int){
 //        self.title = title
 //        self.summary = summary
-//        self.photo = photo
+//        self.id = id
+//
 //    }
 //}

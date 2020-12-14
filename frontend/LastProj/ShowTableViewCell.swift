@@ -10,14 +10,16 @@ import Kingfisher
 
 class ShowTableViewCell: UITableViewCell {
     
+    weak var delegate: DeleteDelgate?
     private let containerView = UIView()
     private let showImageView = UIImageView()
     private let nameLabel = UILabel()
+    private let deleteButton = UIButton()
+    var id = 0
 
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
         selectionStyle = .none
         backgroundColor = UIColor(red: 239/255, green: 239/255, blue: 239/255, alpha: 1)
         
@@ -38,6 +40,14 @@ class ShowTableViewCell: UITableViewCell {
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.font = .boldSystemFont(ofSize: 18)
         containerView.addSubview(nameLabel)
+        
+        deleteButton.translatesAutoresizingMaskIntoConstraints = false
+        deleteButton.setTitle("Delete", for: .normal)
+        deleteButton.backgroundColor = .white
+        deleteButton.layer.cornerRadius = 4
+        deleteButton.setTitleColor(.blue, for: .normal)
+        deleteButton.addTarget(self, action: #selector(deleteAnime), for: .touchUpInside)
+        containerView.addSubview(deleteButton)
         
     
         setupConstraints()
@@ -73,19 +83,32 @@ class ShowTableViewCell: UITableViewCell {
 
         ])
         
-      
+        NSLayoutConstraint.activate([
+                    deleteButton.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: padding),
+                    deleteButton.leadingAnchor.constraint(equalTo: showImageView.leadingAnchor, constant: padding),
+
+                ])
         
     }
     
-    private func getCategoriesText(categories: [String]) -> String {
-        return categories.joined(separator: ", ")
-    }
-    
+//    private func getCategoriesText(categories: [String]) -> String {
+//        return categories.joined(separator: ", ")
+//    }
+//
     func configure(for show: Show) {
-        let photoURL = URL(string:"https://i2.wp.com/www.tor.com/wp-content/uploads/2015/12/NanaTai.png?type=vertical")
+        let photoURL = URL(string:"https://i.pinimg.com/originals/50/9c/65/509c659e8ec1d7edbac70a7be3bfb966.jpg")
         showImageView.kf.setImage(with: photoURL)
         nameLabel.text = show.name
+        self.id = show.id
        
     }
+    
+    @objc func deleteAnime() {
+        print(self.delegate?.delAnime(id: self.id))
+        NetworkManager.deleteShow(id: self.id) { _ in
+            print("here")
+        }
+       
+        }
     
 }

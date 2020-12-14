@@ -6,13 +6,13 @@
 //
 
 import UIKit
+//import ViewController
 
 class AddAnimeViewController: UIViewController {
     weak var delegate: NameDelegate?
     var button: UIButton!
     var textField: UITextField!
     var placeHolderText: String
-
 
     
     init(placeHolder: String){
@@ -73,19 +73,20 @@ class AddAnimeViewController: UIViewController {
 
       }
 
-      @objc func addText() {
-        if let text = textField.text, text != ""{
-            delegate?.AddAnime(newTitle: text)
+    @objc func addText() {
+        if let name = textField.text, name != ""{
+            let description = ""
+            NetworkManager.addShow(name: name, description: description) { _ in
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: {
+                self.dismiss(animated: true, completion: nil)
+                self.delegate?.AddAnime(newTitle: name)
+            })
+            
         }
-        else{
-             print("Cannot save empty line")
-        }
-        dismiss(animated: true, completion: nil)
-        
-        
-        
-      }
-
+    }
+    dismiss(animated: true, completion: nil)
 }
 
 
+}

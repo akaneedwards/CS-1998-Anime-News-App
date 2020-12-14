@@ -13,7 +13,12 @@ protocol NameDelegate: class{
     func AddAnime(newTitle:String)
 }
 
+protocol DeleteDelgate: class {
+    func delAnime(id:Int)
+}
+
 class ViewController: UIViewController {
+    
     
     
     private let showsTableView = UITableView()
@@ -25,13 +30,12 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         //color is ugly, change it
-        view.backgroundColor = UIColor(red: 245/255, green: 204/255, blue: 245/255, alpha: 1)
+        view.backgroundColor = UIColor(red: 235/255, green: 204/255, blue: 234/255, alpha: 1)
         
-        title = "Anime News"
-        navigationController?.navigationBar.barTintColor = UIColor(red: 235/255, green: 204/255, blue: 235/255, alpha: 1)
-        navigationController?.navigationBar.tintColor = .blue
-        
-        
+        title = "Upcoming Anime"
+        navigationController?.navigationBar.barTintColor = UIColor(red: 150/255, green: 75/255, blue: 150/255, alpha: 0.1)
+        navigationController?.navigationBar.tintColor = .white
+                
         showsTableView.delegate = self
         showsTableView.dataSource = self
         showsTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -43,12 +47,12 @@ class ViewController: UIViewController {
         presentModalViewControllerButton = UIButton()
         presentModalViewControllerButton.translatesAutoresizingMaskIntoConstraints = false
         presentModalViewControllerButton.setTitle("Add Anime", for: .normal)
-        presentModalViewControllerButton.setTitleColor(.systemBlue, for: .normal)
+        presentModalViewControllerButton.setTitleColor(.systemPurple, for: .normal)
         presentModalViewControllerButton.backgroundColor = .white
         presentModalViewControllerButton.layer.cornerRadius = 4
         presentModalViewControllerButton.layer.borderWidth = 1
         presentModalViewControllerButton.contentEdgeInsets = UIEdgeInsets(top: 5,left: 5,bottom: 5,right: 5)
-        presentModalViewControllerButton.layer.borderColor = UIColor.blue.cgColor
+        presentModalViewControllerButton.layer.borderColor = UIColor.purple.cgColor
         presentModalViewControllerButton.addTarget(self, action: #selector(presentModalViewController), for: .touchUpInside)
         view.addSubview(presentModalViewControllerButton)
         
@@ -73,14 +77,14 @@ class ViewController: UIViewController {
     }
     
     @objc func presentModalViewController() {
-       let newViewController = AddAnimeViewController(placeHolder: presentModalViewControllerButton.titleLabel?.text ?? "Placeholder")
-//       newViewController.delegate = self
+        let newViewController = AddAnimeViewController(placeHolder: presentModalViewControllerButton.titleLabel?.text ?? "Add anime")
+       newViewController.delegate = self
        present(newViewController, animated: true, completion: nil)
        
     }
     
     // get all shows
-    private func getShows(){
+   private func getShows(){
         NetworkManager.getShows { (shows) in
             self.shows = shows
             self.showsTableView.reloadData()
@@ -116,6 +120,26 @@ extension ViewController: UITableViewDataSource {
         return cell
     }
 }
+
+
+
+extension ViewController: NameDelegate{
+    func AddAnime(newTitle: String) {
+        let show = Show(id: shows.count+1, name:newTitle, description: "")
+        shows.append(show)
+        showsTableView.reloadData()
+    }
+}
+
+extension ViewController: DeleteDelgate{
+    func delAnime(id: Int) {
+        print(shows[id-1])
+        shows.remove(at: id-1)
+        showsTableView.reloadData()
+    }
+    
+    
+}
 //
 //extension ViewController: NameDelegate{
 //    func AddAnime(newTitle: String) {
@@ -124,3 +148,7 @@ extension ViewController: UITableViewDataSource {
 //        showsTableView.reloadData()
 //    }
 //}
+
+
+
+

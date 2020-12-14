@@ -33,48 +33,53 @@ class NetworkManager {
         }
     }
     
-    static func addShow(id: Int, name: String, completion: @escaping (Show) -> Void) {
-        let parameters: [String: Any] = [
-            "id": id,
-            "name": name
+
+    static func addShow(name: String, description: String, completion: @escaping (Show) -> Void) {
+        let endpoint = "https://animenewsapp.herokuapp.com/api/animes/"
+//        let headers: HTTPHeaders = [
+//            "Content-Type":"application/json"
+//                ]
+        let parameters: [String: String] = [
+            "name": name,
+            "description": "test description"
         ]
-        AF.request(host, method: .post, parameters: parameters ).validate().responseData { response in
+        AF.request(endpoint, method: .post, parameters: parameters,  encoder: JSONParameterEncoder.default).validate().responseData { response in
+            debugPrint(response)
             switch response.result {
             case .success(let data):
                 let jsonDecoder = JSONDecoder()
                 
-                if let showData = try? jsonDecoder.decode(Response<Show>.self, from: data) {
-                    let shows = showData.data
-                    completion(shows)
+                if let courseData = try? jsonDecoder.decode(Response<Show>.self, from: data) {
+                    let classes = courseData.data
+                    completion(classes)
                 }
-                
+//
             case .failure(let error):
                 print(error.localizedDescription)
+//                print("here")
+            }
+        }
+    }
+
+    static func deleteShow(id:Int, completion: @escaping (Show) -> Void) {
+        let endpoint = "\(host)/animes/\(id)/"
+        AF.request(endpoint, method: .delete).validate().responseData { response in
+            debugPrint(response)
+            switch response.result {
+            case .success(let data):
+                let jsonDecoder = JSONDecoder()
+                
+                if let courseData = try? jsonDecoder.decode(Response<Show>.self, from: data) {
+                    let classes = courseData.data
+                    completion(classes)
+                }
+//
+            case .failure(let error):
+                print(error.localizedDescription)
+//                print("here")
             }
         }
     }
     
-    // get a show
-//    static func getShow(id: Int, completion: @escaping (Show) -> Void) {
-//        let parameters: [String: Any] = [
-//            "id": id
-//        ]
-//        let endpoint = "\(host)/animes/"
-//        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default).validate().responseData { response in
-//            switch response.result {
-//            case .success(let data):
-//                let jsonDecoder = JSONDecoder()
-//                jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-//                
-//                if let showData = try? jsonDecoder.decode(Show.self, from: data) {
-//                        let show = showData
-//                        completion(show)
-//                }
-//            case .failure(let error):
-//                print(error.localizedDescription)
-//            }
-//        }
-//    }
-    
-    
 }
+

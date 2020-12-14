@@ -32,7 +32,7 @@ class ShowViewController: UIViewController {
         
         view.backgroundColor = .white
         
-        let photoURL = URL(string:"https://i2.wp.com/www.tor.com/wp-content/uploads/2015/12/NanaTai.png?type=vertical")
+        let photoURL = URL(string:"https://i.pinimg.com/originals/50/9c/65/509c659e8ec1d7edbac70a7be3bfb966.jpg")
         showImageView.kf.setImage(with: photoURL)
         showImageView.translatesAutoresizingMaskIntoConstraints = false
         showImageView.contentMode = .scaleAspectFill
