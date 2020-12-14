@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 
 from time import sleep
 from db import db
-from db import Anime
+from db import Anime, User
 from flask import Flask
 from flask import request
 
@@ -50,8 +50,6 @@ with app.app_context():
             db.session.commit()
             new_anime.serialize()
 
-
-# your routes here
 # generalized response formats
 def success_response(data, code=200):
     return json.dumps({"success": True, "data": data}), code
@@ -62,7 +60,6 @@ def failure_response(message, code=404):
 
 
 # -- ANIME ROUTES ------------------------------------------------------
-
 
 @app.route("/")
 @app.route("/api/animes/")
@@ -78,7 +75,19 @@ def create_anime():
     db.session.commit()
     return success_response(new_anime.serialize(), 201)
 
+@app.route("/api/animes/<int:anime_id>/")
+def get_anime(anime_id):
+    anime = Anime.query.filter_by(id=anime_id).first()
+    if anime is None:
+        return failure_response('Anime is not found!')
+    return success_response(anime.serialize())
 
+@app.route("/api/animes/name/<string:anime_name>/")
+def get_anime_by_name(anime_name):
+    anime = Anime.query.filter_by(name=anime_name).first()
+    if anime is None:
+        return failure_response('Anime is not found!')
+    return success_response(anime.serialize())
 
 @app.route("/api/animes/<int:anime_id>/", methods=["DELETE"])
 def delete_anime(anime_id):
@@ -89,7 +98,44 @@ def delete_anime(anime_id):
     db.session.commit()
     return success_response(anime.serialize())
 
+@app.route("/api/animes/name/<string:anime_name>/", methods=["DELETE"])
+def delete_anime_by_name(anime_name):
+    anime = Anime.query.filter_by(name=anime_name).first()
+    if anime is None:
+        return failure_response('Anime not found!')
+    db.session.delete(anime)
+    db.session.commit()
+    return success_response(anime.serialize())
 
+# -- USER ROUTES ------------------------------------------------------
+@app.route("/api/users/", methods=["POST"])
+def create_user():
+    body = json.loads(request.data)
+    new_user = User(username=body.get('username'))
+    db.session.add(new_user)
+    db.session.commit()
+    return success_response(new_user.serialize(), 201)
+
+@app.route("/api/users/<int:user_id>/")
+def get_user(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return failure_response('User not found!')
+    return success_response(user.serialize())
+
+@app.route("/api/users/<int:user_id>/add/", methods=["POST"])
+def add_fav(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return failure_response('User not found!')
+    body = json.loads(request.data)
+    anime_id = body.get('anime_id')
+    anime = Anime.query.filter_by(id=anime_id).first()
+    if anime is None:
+        return failure_response('Anime not found!')
+    user.favorites.append(anime)
+    db.session.commit()
+    return success_response(anime.serialize())
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
